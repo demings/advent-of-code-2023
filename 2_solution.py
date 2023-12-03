@@ -29,17 +29,19 @@ limits = {
     "blue": 14,
 }
 
-possible_games = []
+game_powers = []
 for idx, game in enumerate(games):
-    possible = True
+    min_viable = {
+        "red": 0,
+        "green": 0,
+        "blue": 0,
+    }
     for sets in game:
         for set in sets:
-            if set[0] > limits[set[1]]:
-                possible = False
-                break
-        if not possible:
-            break
-    if possible:
-        possible_games.append(idx + 1)
+            if set[0] > min_viable[set[1]]:
+                min_viable[set[1]] = set[0]
 
-print(functools.reduce(lambda x, y: x + y, possible_games))
+    game_powers.append(min_viable["red"] * min_viable["green"] * min_viable["blue"])
+
+
+print(functools.reduce(lambda x, y: x + y, game_powers))
