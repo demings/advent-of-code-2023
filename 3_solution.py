@@ -26,57 +26,68 @@ def get_adjacent_coords(first_digit_coord, length):
     return adjacent_coords
 
 
-def get_numbers_in_line(line):
+for idx, line in enumerate(lines):
+    lines[idx] = line.replace("\n", "")
+
+
+def get_numbers_of_coords(coords, lines):
     numbers = []
 
-    for idx, char in enumerate(line):
-        if char.isdigit():
-            if idx > 0 and line[idx - 1].isdigit():
-                numbers[len(numbers) - 1] = numbers[len(numbers) - 1] * 10 + int(char)
-            else:
-                numbers.append(int(char))
+    for coord in coords:
+        if coord[0] < 0 or coord[1] < 0:
+            continue
+
+        if coord[0] > len(line) - 1 or coord[1] > len(lines) - 1:
+            continue
+
+        current_coords = coord.copy()
+        number_str = str(lines[current_coords[1]][current_coords[0]])
+        current_coords[0] -= 1
+        while current_coords[0] >= 0 and lines[coord[1]][current_coords[0]].isdigit():
+            for c in coords:
+                if c[0] == current_coords[0] and c[1] == current_coords[1]:
+                    coords.remove(c)
+
+            number_str = lines[coord[1]][current_coords[0]] + number_str
+            current_coords[0] -= 1
+
+        current_coords[0] = coord[0] + 1
+        while (
+            current_coords[0] < len(lines[current_coords[1]])
+            and lines[current_coords[1]][current_coords[0]].isdigit()
+        ):
+            for c in coords:
+                if c[0] == current_coords[0] and c[1] == current_coords[1]:
+                    coords.remove(c)
+
+            number_str = number_str + lines[coord[1]][current_coords[0]]
+            current_coords[0] += 1
+
+        numbers.append(int(number_str))
 
     return numbers
 
 
-def is_symbol(char):
-    return not char == "."
+gear_coords = []
 
+for line_idx, line in enumerate(lines):
+    for char_idx, char in enumerate(line):
+        if char == "*":
+            gear_coords.append([char_idx, line_idx])
 
-part_numbers = []
-non_part_numbers = []
+multiples = []
+for gear_coord in gear_coords:
+    adj_coords = get_adjacent_coords(gear_coord, 1)
 
-for idx, line in enumerate(lines):
-    lines[idx] = line.replace("\n", "")
+    digit_coords = []
 
-for line_index, line in enumerate(lines):
-    numbers = get_numbers_in_line(line)
+    for coord in adj_coords:
+        if lines[coord[1]][coord[0]].isdigit():
+            digit_coords.append(coord)
 
-    for number in [int(num) for num in numbers]:
-        number_index = line.find(str(number))
+    numbers = get_numbers_of_coords(digit_coords, lines)
 
-        added = False
+    if len(numbers) == 2:
+        multiples.append(functools.reduce(lambda a, b: a * b, numbers))
 
-        adj_coords = get_adjacent_coords([number_index, line_index], len(str(number)))
-
-        for coord in adj_coords:
-            if coord[0] < 0 or coord[1] < 0:
-                continue
-
-            if coord[0] > len(line) - 1 or coord[1] > len(lines) - 1:
-                continue
-
-            if is_symbol(lines[coord[1]][coord[0]]):
-                part_numbers.append(number)
-                added = True
-                break
-
-        if not added:
-            non_part_numbers.append(number)
-            line = line.replace(str(number), "X" * len(str(number)), 1)
-        else:
-            line = line.replace(str(number), "O" * len(str(number)), 1)
-
-        lines[line_index] = line
-
-print(functools.reduce(lambda x, y: x + y, part_numbers))
+print(functools.reduce(lambda x, y: x + y, multiples))
