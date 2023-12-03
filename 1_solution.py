@@ -2,7 +2,6 @@ with open("1_input.txt") as f:
     lines = f.readlines()
 
 digit_map = {
-    "zero": 0,
     "one": 1,
     "two": 2,
     "three": 3,
