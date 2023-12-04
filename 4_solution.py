@@ -1,20 +1,38 @@
-with open("4_input.txt") as f:
-    lines = f.readlines()
+class Card:
+    def __init__(self, id, winning_nums, your_nums):
+        self.id = id
+        self.winning_nums = winning_nums
+        self.your_nums = your_nums
 
-cards = []
-for line in lines:
-    [winning_nums, your_nums] = line.split(":")[1].replace("\n", "").split("|")
-    winning_nums = winning_nums.strip().split()
-    your_nums = your_nums.strip().split()
-    cards.append([winning_nums, your_nums])
 
-points = 0
+def get_cards() -> list[Card]:
+    with open("4_input.txt") as f:
+        lines = f.readlines()
+
+    cards = []
+    for idx, line in enumerate(lines):
+        [winning_nums, your_nums] = line.split(":")[1].replace("\n", "").split("|")
+        winning_nums = winning_nums.strip().split()
+        your_nums = your_nums.strip().split()
+        cards.append(Card(idx + 1, winning_nums, your_nums))
+
+    return cards
+
+
+cards = get_cards()
+
+match_cache = {}
 for card in cards:
-    match_count = 0
-    for your_num in card[1]:
-        if your_num in card[0]:
-            match_count += 1
-    if match_count > 0:
-        points += pow(2, match_count - 1)
+    if card.id in match_cache.keys():
+        match_count = match_cache[card.id]
+    else:
+        match_count = 0
+        for your_num in card.your_nums:
+            if your_num in card.winning_nums:
+                match_count += 1
+        match_cache[card.id] = match_count
 
-print(points)
+    for i in range(match_count):
+        cards.append(cards[card.id + i])
+
+print(len(cards))
