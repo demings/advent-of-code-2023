@@ -9,11 +9,17 @@ for line in lines:
     hands.append([split[0], int(split[1])])
 
 
-def is_five(hand):
-    return len(set(hand)) == 1
+def is_five(hand: str):
+    return len(set(hand.replace("J", ""))) == 1 or len(set(hand.replace("J", ""))) == 0
 
 
-def is_four(hand):
+def is_four(hand: str):
+    if "J" in hand:
+        if hand.count("J") == 1:
+            return is_three(hand.replace("J", ""))
+        else:
+            return len(set(hand.replace("J", ""))) == 2
+
     count1 = 0
     count2 = 0
 
@@ -26,11 +32,14 @@ def is_four(hand):
     return count1 == 4 or count2 == 4
 
 
-def is_full(hand):
-    return len(set(hand)) == 2
+def is_full(hand: str):
+    return len(set(hand.replace("J", ""))) == 2
 
 
-def is_three(hand):
+def is_three(hand: str):
+    if "J" in hand:
+        return len(set(hand.replace("J", ""))) == 3
+
     count1 = 0
     count2 = 0
     count3 = 0
@@ -46,15 +55,18 @@ def is_three(hand):
     return count1 == 3 or count2 == 3 or count3 == 3
 
 
-def is_two(hand):
+def is_two(hand: str):
     return len(set(hand)) == 3
 
 
-def is_one(hand):
+def is_one(hand: str):
+    if "J" in hand:
+        return True
+
     return len(set(hand)) == 4
 
 
-def is_high(hand):
+def is_high(hand: str):
     return len(set(hand)) == 5
 
 
@@ -71,7 +83,6 @@ card_types = {
     "A": 14,
     "K": 13,
     "Q": 12,
-    "J": 11,
     "T": 10,
     "9": 9,
     "8": 8,
@@ -81,10 +92,11 @@ card_types = {
     "4": 4,
     "3": 3,
     "2": 2,
+    "J": 1
 }
 
 
-def get_hand_type_index(hand):
+def get_hand_type_index(hand: str):
     for idx, key in enumerate(hand_types.keys()):
         if hand_types[key](hand):
             return idx
