@@ -16,13 +16,13 @@ def get_next_sequence(sequence: list[int]):
 
 
 def get_forecast(sequences: list[list[int]]):
-    last_el = 0
+    first_el = 0
 
     for sequence in reversed(sequences):
-        sequence.append(sequence[-1] + last_el)
-        last_el = sequence[-1]
+        sequence = [sequence[0] - first_el] + sequence
+        first_el = sequence[0]
 
-    return last_el
+    return first_el
 
 
 forecast_sum = 0
